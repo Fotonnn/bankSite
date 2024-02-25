@@ -11,16 +11,18 @@ import com.bank.bank.DadosUser.DadosCadastro;
 import com.bank.bank.DataBase.UserData;
 import com.bank.bank.Entity.User;
 
-@RestController
-@RequestMapping("cadastro")
+import jakarta.validation.Valid;
+
+@RestController //indica que é um controller
+@RequestMapping("cadastro") //mapear o request exemplo site.com/cadastro
 public class CadastroController {
 
     @Autowired
     private UserData userData;
     
-    @PostMapping
-    @Transactional
-    public void cadastro(@RequestBody DadosCadastro dados) {
+    @PostMapping //indica que é um metodo post
+    @Transactional //é ativo, algo assim
+    public void cadastro(@RequestBody @Valid DadosCadastro dados) { //tem que avisar pro spring que recebe como rbody
         userData.save(new User(dados));
     }
 }

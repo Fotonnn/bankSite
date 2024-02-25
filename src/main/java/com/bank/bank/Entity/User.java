@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 
 @Table(name = "users")
 @Entity(name = "User")
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Getter //getters automatico
+@NoArgsConstructor //construtor sem argumentos
+@AllArgsConstructor //autoexplicativo
+@EqualsAndHashCode(of = "user_id") //seguranca para ids
+public class User { 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) //indica que é um valor gerado automaticamente, tanto que nao precisa por ele no construtor
     private int user_id;
 
     private String username;
@@ -30,7 +30,7 @@ public class User {
     private String useremail;
 
 
-    public User(DadosCadastro dados) {
+    public User(DadosCadastro dados) { //construtor pra cadastrar por meio da req post
         this.username = dados.username();
         this.userage = dados.userage();
         this.userbalance = dados.userbalance();
