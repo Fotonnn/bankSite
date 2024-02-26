@@ -29,19 +29,16 @@ public class Transactions {
 
 //tava dando erro pq o userData tava aqui, aparentemente Jpa somente no controller
 
-    public void makeTransfer(double amount, User payer, User receiver) throws Exception{
-        //User payer = userData.getReferenceById(payer_id);
-        //User receiver = userData.getReferenceById(receiver_id);
-        double saldo = payer.getUserbalance() - amount;
-        if (saldo < 0) {
-            throw new Exception("Saldo insuficiente");
+    public double checkIfHaveMoney(double amount, User user) throws Exception {
+        double result = user.getUserbalance() - amount;
+        if (result < 0) {
+            throw new Exception("No suficient money");
         }
-        payer.setUserbalance(saldo);
-        receiver.setUserbalance(receiver.getUserbalance() + amount);
+        return result;
     }
 
-    public Transactions(DadosTransferencia data) {
-        this.payer_id = data.payer_id();
+    public Transactions(DadosTransferencia data, int payer_id) {
+        this.payer_id = payer_id;
         this.receiver_id = data.receiver_id();
         this.amount = data.amount();
     }

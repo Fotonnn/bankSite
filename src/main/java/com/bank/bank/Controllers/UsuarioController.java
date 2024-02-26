@@ -38,7 +38,6 @@ public class UsuarioController {
 
     Logger log = Logger.getLogger("Controller de Usuario");
 
-    private boolean isLogged;
     private User user;
 
     
@@ -46,7 +45,9 @@ public class UsuarioController {
     @Transactional //é ativo, algo assim
     public void cadastro(@RequestBody @Valid DadosCadastro dados) { //tem que avisar pro spring que recebe como rbody
         log.info("Cadastro feito");
-        userData.save(new User(dados));
+        user = new User(dados);
+        userData.save(user);
+        log.info("Usuario logado.");
     }
 
     @PostMapping("login")
@@ -54,20 +55,22 @@ public class UsuarioController {
     public ResponseEntity<String> getMethodName(@RequestBody DadosLogin loginReq) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ip = request.getRemoteAddr();
+        if (user != null) {
+            return ResponseEntity.badRequest().body("Already logged in");
+        }
         log.info("ip login: " + ip);
         user = userData.getReferenceById(loginReq.user_id());
         if (!loginReq.userpassword().equals(user.getUserpassword())) {
             log.info("senha errada");
-            isLogged = false;
+            
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Senha errada");
         }
-        isLogged = true;
         return ResponseEntity.ok("Login bem sucedido");
     }
 
     @GetMapping("balance")
     public double getBalance() throws Exception{
-        if (!isLogged) {
+        if (user == null) {
             log.info("Usuario tentando acessar sem login");
             ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Sem login.");
             throw new Exception("Sem login");
@@ -77,9 +80,29 @@ public class UsuarioController {
         return balance;
     }
 
+    @SuppressWarnings("null")
     @PostMapping("payment")
-    @Transactional
     public ResponseEntity<String> payment(@RequestBody @Valid DadosTransferencia dados) {
+        //CASO O USER DEVA FICAR NO BACK-END (NAO SEI AINDA) VOU FAZER COMO SE JA FOSSE PRA NAO PRECISAR BUSCAR EU MESMO NA DB
+        try {
+            if (user != null && user.getUser_id() != dados.receiver_id()) {
+                double result = user.getUserbalance() - dados.amount();
+                if (result < 0) {
+                    throw new Exception("No suficient money");
+                }
+                User receiver = userData.getReferenceById(dados.receiver_id());
+                user.setUserbalance(result);
+                receiver.setUserbalance(receiver.getUserbalance() + dados.amount());
+                userData.save(user);
+                userData.save(receiver);
+                transactionsData.save(new Transactions(dados, user.getUser_id()));
+                return ResponseEntity.ok("Pagamento bem sucedido.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Bad request (no money or error)");
+        }
+        return ResponseEntity.badRequest().body("Bad request");
+        /* 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Pagador nao logado");
         }
@@ -95,6 +118,7 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Bad request" + e.getMessage());
         }
+        */
     }
     
 }
