@@ -11,10 +11,12 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Table(name = "users")
 @Entity(name = "User")
 @Getter //getters automatico
+@Setter
 @NoArgsConstructor //construtor sem argumentos
 @AllArgsConstructor //autoexplicativo
 @EqualsAndHashCode(of = "user_id") //seguranca para ids
