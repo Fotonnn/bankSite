@@ -40,4 +40,14 @@ public class User {
         this.usercpf = dados.usercpf();
         this.useremail = dados.useremail();
     }
+
+    public String getInfoAsString() { //feito com gpt, salva tempo
+        return "User ID: " + user_id + "\n" +
+               "Username: " + username + "\n" +
+               "User Age: " + userage + "\n" +
+               "User Balance: " + userbalance + "\n" +
+               "User Password: " + userpassword + "\n" +
+               "User CPF: " + usercpf + "\n" +
+               "User Email: " + useremail;
+    }
 }

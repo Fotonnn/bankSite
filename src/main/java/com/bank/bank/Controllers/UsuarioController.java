@@ -56,7 +56,7 @@ public class UsuarioController {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ip = request.getRemoteAddr();
         if (user != null) {
-            return ResponseEntity.badRequest().body("Already logged in");
+            return ResponseEntity.badRequest().body("Please get out of the account to login in another account.");
         }
         log.info("ip login: " + ip);
         user = userData.getReferenceById(loginReq.user_id());
@@ -67,6 +67,16 @@ public class UsuarioController {
         }
         return ResponseEntity.ok("Login bem sucedido");
     }
+
+    @PostMapping("logout")
+    public ResponseEntity<String> getOutOfAccount() {
+        if (user == null) {
+            return ResponseEntity.badRequest().body("There is no account to get out!");
+        }
+        user = null;
+        return ResponseEntity.ok().body("Sucess logged out");
+    }
+    
 
     @GetMapping("balance")
     public double getBalance() throws Exception{
@@ -120,5 +130,25 @@ public class UsuarioController {
         }
         */
     }
+
+    @GetMapping("userinfo")
+    public String getUserInfo() throws Exception {
+       if (user == null) {
+            throw new Exception();
+       }
+       return user.getInfoAsString();
+    }
+
+    @SuppressWarnings("null")
+    @PostMapping("deleteuser")
+    public ResponseEntity<String> deleteUser() throws Exception {
+        if (user == null) {
+            throw new Exception();
+        }
+        userData.delete(user);
+        user = null;
+        return ResponseEntity.ok("Sucesso");
+    }
+
     
 }
