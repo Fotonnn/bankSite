@@ -1,5 +1,6 @@
 package com.bank.bank.Entity;
 
+
 import com.bank.bank.DadosUser.DadosTransferencia;
 
 import jakarta.persistence.Entity;

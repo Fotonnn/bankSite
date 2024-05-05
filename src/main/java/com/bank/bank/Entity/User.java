@@ -50,4 +50,6 @@ public class User {
                "User CPF: " + usercpf + "\n" +
                "User Email: " + useremail;
     }
+
+    
 }

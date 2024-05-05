@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,16 +45,17 @@ public class UsuarioController {
     
     @PostMapping("cadastro") //indica que é um metodo post
     @Transactional //é ativo, algo assim
-    public void cadastro(@RequestBody @Valid DadosCadastro dados) { //tem que avisar pro spring que recebe como rbody
+    public ResponseEntity<Object> cadastro(@RequestBody @Valid DadosCadastro dados) { //tem que avisar pro spring que recebe como rbody
         log.info("Cadastro feito");
         user = new User(dados);
         userData.save(user);
         log.info("Usuario logado.");
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("login")
     @Transactional
-    public ResponseEntity<String> getMethodName(@RequestBody DadosLogin loginReq) {
+    public ResponseEntity<Object> login(@RequestBody DadosLogin loginReq) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String ip = request.getRemoteAddr();
         if (user != null) {
@@ -69,17 +72,17 @@ public class UsuarioController {
     }
 
     @PostMapping("logout")
-    public ResponseEntity<String> getOutOfAccount() {
+    public ResponseEntity<Object> getOutOfAccount() {
         if (user == null) {
-            return ResponseEntity.badRequest().body("There is no account to get out!");
+            return ResponseEntity.badRequest().build();
         }
         user = null;
-        return ResponseEntity.ok().body("Sucess logged out");
+        return ResponseEntity.ok().build();
     }
     
 
     @GetMapping("balance")
-    public double getBalance() throws Exception{
+    public ResponseEntity<Object> getBalance() throws Exception{
         if (user == null) {
             log.info("Usuario tentando acessar sem login");
             ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Sem login.");
@@ -87,13 +90,11 @@ public class UsuarioController {
         }
         double balance = user.getUserbalance();
         log.info("balance retornado.");
-        return balance;
+        return ResponseEntity.ok(balance);
     }
 
-    @SuppressWarnings("null")
     @PostMapping("payment")
-    public ResponseEntity<String> payment(@RequestBody @Valid DadosTransferencia dados) {
-        //CASO O USER DEVA FICAR NO BACK-END (NAO SEI AINDA) VOU FAZER COMO SE JA FOSSE PRA NAO PRECISAR BUSCAR EU MESMO NA DB
+    public ResponseEntity<Object> payment(@RequestBody @Valid DadosTransferencia dados) {
         try {
             if (user != null && user.getUser_id() != dados.receiver_id()) {
                 double result = user.getUserbalance() - dados.amount();
@@ -106,29 +107,12 @@ public class UsuarioController {
                 userData.save(user);
                 userData.save(receiver);
                 transactionsData.save(new Transactions(dados, user.getUser_id()));
-                return ResponseEntity.ok("Pagamento bem sucedido.");
+                return ResponseEntity.ok().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Bad request (no money or error)");
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().body("Bad request");
-        /* 
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Pagador nao logado");
-        }
-        try {
-        User payer = userData.getReferenceById(dados.payer_id());
-        User receiver = userData.getReferenceById(dados.receiver_id());
-        Transactions transactions = new Transactions(dados);
-        transactions.makeTransfer(dados.amount(), payer, receiver);
-        transactionsData.save(transactions);
-        userData.save(payer);
-        userData.save(receiver);
-        return ResponseEntity.ok("Pagamento bem sucedido.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Bad request" + e.getMessage());
-        }
-        */
+        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("userinfo")
@@ -139,16 +123,15 @@ public class UsuarioController {
        return user.getInfoAsString();
     }
 
-    @SuppressWarnings("null")
-    @PostMapping("deleteuser")
-    public ResponseEntity<String> deleteUser() throws Exception {
-        if (user == null) {
-            throw new Exception();
-        }
-        userData.delete(user);
-        user = null;
-        return ResponseEntity.ok("Sucesso");
+    @DeleteMapping("/delete/{id}")
+    @Transactional                           //diz que é um parametro do path
+    public ResponseEntity<Object> deleteUser(@PathVariable int id) {
+        userData.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
-    
+   // @PostMapping
+    //public ResponseEntity<Object> updateUser() {
+
+    //}
 }
