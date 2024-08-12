@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 
 
 @RestController //indica que é um controller
-@RequestMapping("usuarios") //mapear o request exemplo site.com/cadastro
+@RequestMapping("api") //mapear o request exemplo site.com/cadastro
 public class UsuarioController {
 
     @Autowired
@@ -68,7 +68,7 @@ public class UsuarioController {
             
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Senha errada");
         }
-        return ResponseEntity.ok("Login bem sucedido");
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("logout")
