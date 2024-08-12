@@ -1,13 +1,9 @@
-create table users(
-
-    user_id int not null auto_increment,
-    username varchar(100) not null,
-    userage int not null,
-    userpassword varchar(45) not null,
-    userbalance decimal(10, 2) not null default 0.0,
-    useremail varchar(100) not null unique,
-    usercpf varchar(11) not null unique,
-
-    primary key(user_id)
-
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    userage INT NOT NULL,
+    userpassword VARCHAR(45) NOT NULL,
+    userbalance DECIMAL(10, 2) NOT NULL DEFAULT 0.0,
+    useremail VARCHAR(100) NOT NULL UNIQUE,
+    usercpf VARCHAR(11) NOT NULL UNIQUE
 );

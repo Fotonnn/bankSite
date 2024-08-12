@@ -1,12 +1,8 @@
-create table transactions(
-
-    transaction_id int not null auto_increment,
-    payer_id int not null,
-    receiver_id int not null,
-    amount double not null,
-    foreign key (payer_id) references users(user_id),
-    foreign key (receiver_id) references users(user_id),
-
-    primary key(transaction_id)
-
+CREATE TABLE transactions (
+    transaction_id SERIAL PRIMARY KEY,
+    payer_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
+    FOREIGN KEY (payer_id) REFERENCES users(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES users(user_id)
 );
