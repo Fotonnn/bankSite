@@ -1,4 +1,4 @@
-document.getElementById('cadasterform').addEventListener('submit', async function(event) {
+document.getElementById('cadasterform').addEventListener('submit', async function (event) {
   event.preventDefault();
 
   const username = document.getElementById("username").value;
@@ -9,15 +9,15 @@ document.getElementById('cadasterform').addEventListener('submit', async functio
 
   const options = {
     method: 'POST',
-    headers: {'Content-Type': 'application/json', 'User-Agent': 'insomnia/8.6.1'},
-    body: JSON.stringify({"username":username,"userage":userage,"userbalance":1000.5,"userpassword":userpassword,"usercpf":usercpf,"useremail":useremail})
+    headers: { 'Content-Type': 'application/json', 'User-Agent': 'insomnia/8.6.1' },
+    body: JSON.stringify({ "username": username, "userage": userage, "userbalance": 1000.5, "userpassword": userpassword, "usercpf": usercpf, "useremail": useremail })
   };
   try {
-    const response = await fetch('http://localhost:8080/api/cadastro', options);
+    const response = await fetch('api/cadastro', options);
 
     if (response.ok) {
       console.log('Login successful');
-      window.location.href = 'http://localhost:8080/api/balance'; // URL de redirecionamento ajustada
+      window.location.href = 'api/balance'; // URL de redirecionamento ajustada
     } else {
       const errorText = await response.text(); // Pegando o texto de erro do servidor
       console.error('Login failed:', errorText);

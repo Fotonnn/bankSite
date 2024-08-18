@@ -1,14 +1,18 @@
 package com.bank.bank.Controllers;
 
 import com.bank.bank.DadosUser.DadosCadastro;
-import com.bank.bank.DadosUser.DadosLogin;
 import com.bank.bank.DadosUser.DadosTransferencia;
 import com.bank.bank.DataBase.TransactionsData;
 import com.bank.bank.DataBase.UserData;
 import com.bank.bank.Entity.Transactions;
 import com.bank.bank.Entity.User;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RestController //indica que é um controller
 @RequestMapping("api") //mapear o request exemplo site.com/cadastro
@@ -36,7 +38,7 @@ public class UsuarioController {
 
   Logger log = Logger.getLogger("Controller de Usuario");
 
-  private User user;
+  User user;
 
   @PostMapping("cadastro") //indica que é um metodo post
   @Transactional //é ativo, algo assim
@@ -52,22 +54,28 @@ public class UsuarioController {
 
   @PostMapping("login")
   @Transactional
-  public ResponseEntity<Object> login(@RequestBody DadosLogin loginReq) {
-    HttpServletRequest request =
-      ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-    String ip = request.getRemoteAddr();
+  public void login(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ClassNotFoundException, SQLException, ServletException {
     if (user != null) {
-      return ResponseEntity.badRequest()
-        .body("Please get out of the account to login in another account.");
+      response.sendRedirect("/user");
+      return;
     }
-    log.info("ip login: " + ip);
-    user = userData.getReferenceById(loginReq.user_id());
-    if (!loginReq.userpassword().equals(user.getUserpassword())) {
+    String id = request.getParameter("id");
+    user = userData.getReferenceById(Integer.valueOf(id));
+    if (!request.getParameter("password").equals(user.getUserpassword())) {
       log.info("senha errada");
-
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Senha errada");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong password.");
+      return;
+    } else {
+      HttpSession userSession = request.getSession();
+      userSession.setAttribute("user", user);
+      try {
+        response.sendRedirect("/user");
+      } catch (Exception e) {
+        log.info("Erro ao redirecionar");
+      }
+      return;
     }
-    return ResponseEntity.ok().build();
   }
 
   @PostMapping("logout")
