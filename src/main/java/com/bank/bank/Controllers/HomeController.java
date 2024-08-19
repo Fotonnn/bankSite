@@ -46,7 +46,8 @@ public class HomeController {
     model.addAttribute("cpf", user.getUsercpf());
     model.addAttribute("email", user.getUseremail());
     model.addAttribute("password", user.getUserpassword());
-    model.addAttribute("transactions", user.getTransactions().size());
+    model.addAttribute("transactionsize", user.getTransactions().size());
+    model.addAttribute("transactions", user.getTransactions());
     return "userinfo";
   }
 }

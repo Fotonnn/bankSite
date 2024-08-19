@@ -8,9 +8,23 @@
     <label th:text="${balance}">Balance</label>
     <br />
     <label for="transactions">Transactions: </label>
-    <label th:each="transaction : ${transactions}" th:text="${transaction}"
-      >Transactions</label
-    >
+    <label th:text="${transactionsize }">Transactions</label>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Payer</th>
+          <th>Receiver</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="transaction : ${transactions}">
+          <td th:text="${transaction.amount}">Amount</td>
+          <td th:text="${transaction.payer_id}">Payer</td>
+          <td th:text="${transaction.receiver_id}">Receiver</td>
+        </tr>
+      </tbody>
+    </table>
     <br />
     <label for="user">User ID: </label>
     <label th:text="${id}">User</label>
