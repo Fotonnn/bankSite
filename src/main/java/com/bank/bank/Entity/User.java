@@ -5,7 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +33,9 @@ public class User {
   private String userpassword;
   private String usercpf;
   private String useremail;
+
+  @OneToMany(mappedBy = "payer_id")
+  public List<Transactions> transactions;
 
   public User(DadosCadastro dados) { //construtor pra cadastrar por meio da req post
     this.username = dados.username();
@@ -62,7 +67,9 @@ public class User {
       usercpf +
       "\n" +
       "User Email: " +
-      useremail
+      useremail +
+      "\n" +
+      "Transactions: "
     );
   }
 }

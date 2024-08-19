@@ -6,5 +6,28 @@
   <body>
     <label for="balance">Balance: </label>
     <label th:text="${balance}">Balance</label>
+    <br />
+    <label for="transactions">Transactions: </label>
+    <label th:each="transaction : ${transactions}" th:text="${transaction}"
+      >Transactions</label
+    >
+    <br />
+    <label for="user">User ID: </label>
+    <label th:text="${id}">User</label>
+    <br />
+    <label for="user">Username: </label>
+    <label th:text="${username}">User</label>
+    <br />
+    <label for="password">Password: </label>
+    <label th:text="${password}">Password</label>
+    <br />
+    <label for="email">Email: </label>
+    <label th:text="${email}">Email</label>
+    <br />
+    <label for="age">Age: </label>
+    <label for="age" th:text="${age}"></label>
+    <br />
+    <label for="cpf">Cpf: </label>
+    <label for="cpf" th:text="${cpf}"></label>
   </body>
 </html>

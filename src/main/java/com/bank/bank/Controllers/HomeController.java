@@ -40,6 +40,13 @@ public class HomeController {
     HttpSession userSession = request.getSession(false);
     User user = (User) userSession.getAttribute("user");
     model.addAttribute("balance", user.getUserbalance());
+    model.addAttribute("age", user.getUserage());
+    model.addAttribute("username", user.getUsername());
+    model.addAttribute("id", user.getUser_id());
+    model.addAttribute("cpf", user.getUsercpf());
+    model.addAttribute("email", user.getUseremail());
+    model.addAttribute("password", user.getUserpassword());
+    model.addAttribute("transactions", user.getTransactions().size());
     return "userinfo";
   }
 }

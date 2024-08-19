@@ -1,6 +1,7 @@
 package com.bank.bank.Entity;
 
 import com.bank.bank.DadosUser.DadosTransferencia;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,10 +22,12 @@ public class Transactions {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY) //indica que é um valor gerado automaticamente, tanto que nao precisa por ele no construtor
-  private int transaction_id;
+  private Integer transaction_id;
 
-  private int payer_id;
-  private int receiver_id;
+  @Column
+  private Integer payer_id;
+
+  private Integer receiver_id;
   private double amount;
 
   //tava dando erro pq o userData tava aqui, aparentemente Jpa somente no controller
@@ -37,7 +40,7 @@ public class Transactions {
     return result;
   }
 
-  public Transactions(DadosTransferencia data, int payer_id) {
+  public Transactions(DadosTransferencia data, Integer payer_id) {
     this.payer_id = payer_id;
     this.receiver_id = data.receiver_id();
     this.amount = data.amount();

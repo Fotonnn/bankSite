@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,6 +68,13 @@ public class UsuarioController {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong password.");
       return;
     } else {
+      List<Transactions> transactions = findTransactionsByPayerId(
+        user.getUser_id()
+      );
+      //for (Transactions t : transactions) {
+      //  System.out.println(t.getAmount());
+      //}
+      user.setTransactions(transactions);
       HttpSession userSession = request.getSession();
       userSession.setAttribute("user", user);
       try {
@@ -137,8 +145,8 @@ public class UsuarioController {
     userData.deleteById(id);
     return ResponseEntity.noContent().build();
   }
-  // @PostMapping
-  //public ResponseEntity<Object> updateUser() {
 
-  //}
+  public List<Transactions> findTransactionsByPayerId(Integer payer_id) {
+    return transactionsData.findTransactionsByPayerId(payer_id);
+  }
 }
