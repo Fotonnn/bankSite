@@ -1,7 +1,6 @@
 package com.bank.bank.Controllers;
 
 import com.bank.bank.DadosUser.DadosCadastro;
-import com.bank.bank.DadosUser.DadosTransferencia;
 import com.bank.bank.DataBase.TransactionsData;
 import com.bank.bank.DataBase.UserData;
 import com.bank.bank.Entity.Transactions;
@@ -56,43 +55,34 @@ public class UsuarioController {
   @PostMapping("login")
   @Transactional
   public void login(HttpServletRequest request, HttpServletResponse response)
-    throws IOException, ClassNotFoundException, SQLException, ServletException {
-    if (user != null) {
+    throws IOException {
+    HttpSession userSession = request.getSession();
+    if (userSession.getAttribute("user") != null) {
       response.sendRedirect("/user");
       return;
     }
-    String id = request.getParameter("id");
-    user = userData.getReferenceById(Integer.valueOf(id));
+    int id = Integer.parseInt(request.getParameter("id"));
+    user = userData.getReferenceById(id);
     if (!request.getParameter("password").equals(user.getUserpassword())) {
       log.info("senha errada");
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong password.");
       return;
-    } else {
-      List<Transactions> transactions = findTransactionsByPayerId(
-        user.getUser_id()
-      );
-      //for (Transactions t : transactions) {
-      //  System.out.println(t.getAmount());
-      //}
-      user.setTransactions(transactions);
-      HttpSession userSession = request.getSession();
-      userSession.setAttribute("user", user);
-      try {
-        response.sendRedirect("/user");
-      } catch (Exception e) {
-        log.info("Erro ao redirecionar");
-      }
-      return;
     }
+    userSession.setAttribute("user", user);
+    response.sendRedirect("/user");
   }
 
   @PostMapping("logout")
-  public ResponseEntity<Object> getOutOfAccount() {
-    if (user == null) {
-      return ResponseEntity.badRequest().build();
+  public void getOutOfAccount(HttpServletRequest req, HttpServletResponse res)
+    throws IOException {
+    HttpSession userSession = req.getSession(false);
+    if (userSession == null) {
+      res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Sem login.");
+      return;
     }
-    user = null;
-    return ResponseEntity.ok().build();
+    userSession.invalidate();
+    res.sendRedirect("/login");
+    return;
   }
 
   @GetMapping("balance")
@@ -109,20 +99,32 @@ public class UsuarioController {
 
   @PostMapping("payment")
   public ResponseEntity<Object> payment(
-    @RequestBody @Valid DadosTransferencia dados
-  ) {
+    HttpServletRequest request,
+    HttpServletResponse response
+  ) throws IOException, ClassNotFoundException, SQLException, ServletException {
     try {
-      if (user != null && user.getUser_id() != dados.receiver_id()) {
-        double result = user.getUserbalance() - dados.amount();
+      Integer receiver_id = Integer.parseInt(
+        request.getParameter("receiver_id")
+      );
+      Integer amount = Integer.parseInt(request.getParameter("amount"));
+      if (user != null && user.getUser_id() != receiver_id) {
+        double result =
+          user.getUserbalance() -
+          Integer.parseInt(request.getParameter("amount"));
         if (result < 0) {
           throw new Exception("No suficient money");
         }
-        User receiver = userData.getReferenceById(dados.receiver_id());
+        User receiver = userData.getReferenceById(receiver_id);
         user.setUserbalance(result);
-        receiver.setUserbalance(receiver.getUserbalance() + dados.amount());
+        receiver.setUserbalance(
+          receiver.getUserbalance() +
+          Integer.parseInt(request.getParameter("receiver_id"))
+        );
         userData.save(user);
         userData.save(receiver);
-        transactionsData.save(new Transactions(dados, user.getUser_id()));
+        transactionsData.save(
+          new Transactions(amount, receiver_id, user.getUser_id())
+        );
         return ResponseEntity.ok().build();
       }
     } catch (Exception e) {

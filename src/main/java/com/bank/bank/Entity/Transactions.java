@@ -1,6 +1,5 @@
 package com.bank.bank.Entity;
 
-import com.bank.bank.DadosUser.DadosTransferencia;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,9 +39,9 @@ public class Transactions {
     return result;
   }
 
-  public Transactions(DadosTransferencia data, Integer payer_id) {
+  public Transactions(Integer amount, Integer receiver_id, Integer payer_id) {
     this.payer_id = payer_id;
-    this.receiver_id = data.receiver_id();
-    this.amount = data.amount();
+    this.receiver_id = receiver_id;
+    this.amount = amount;
   }
 }

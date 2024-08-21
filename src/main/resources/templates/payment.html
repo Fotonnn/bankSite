@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Payment Page</title>
+  </head>
+  <body>
+    <h1>Payment Page</h1>
+    <br />
+    <label for="amount">You have: </label>
+    <label th:text="${balance}">Balance</label>
+    <br />
+    <form id="paymentform">
+      <label for="receiver_id">Id:</label><br />
+      <input type="text" id="user_id" /><br />
+      <label for="amount">Amount:</label><br />
+      <input type="text" id="amount" /><br />
+      <br />
+      <button type="submit">Pay</button>
+    </form>
+    <script src="/js/payment.js"></script>
+  </body>
+</html>
